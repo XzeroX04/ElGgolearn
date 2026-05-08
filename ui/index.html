@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElGgolearn | Academic AI Pro</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&family=Space+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<style>
+/* ════════ التصميم الأساسي والألوان ════════ */
+:root {
+  --bg: #050509; --surface: #0a0a12; --surface2: #0f0f1e;
+  --glass: rgba(14, 14, 28, 0.75); --border: rgba(255,255,255,0.06);
+  --gold: #f5c842; --gold2: #e8a800; --green: #00ffb3; --blue: #4fd1ff; --red: #ff5f6d;
+  --text: #e8eaf0; --muted: #6b7590; --sidebar-w: 270px;
+  --r-lg: 22px; --r-md: 14px; --ease: cubic-bezier(0.23, 1, 0.32, 1);
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: 'Tajawal', sans-serif; height: 100vh; overflow: hidden; }
+
+/* ════════ الهيكل الجانبي (Sidebar) واللوجو ════════ */
+.shell { display: grid; grid-template-columns: var(--sidebar-w) 1fr; height: 100vh; position: relative; z-index: 10; }
+.main { overflow-y: auto; padding: 44px 48px; position: relative; scrollbar-width: thin; scrollbar-color: rgba(245,200,66,0.2) transparent; }
+
+.sidebar { background: linear-gradient(180deg, rgba(10,10,20,0.98), rgba(8,8,16,0.99)); border-left: 1px solid var(--border); display: flex; flex-direction: column; padding: 28px 14px; }
+.logo-wrap { padding: 0 10px 36px; border-bottom: 1px solid var(--border); margin-bottom: 24px; }
+.logo-inner { display: flex; align-items: center; gap: 12px; }
+.logo-icon { width: 42px; height: 42px; background: linear-gradient(135deg, var(--gold), var(--gold2)); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 20px; box-shadow: 0 4px 20px rgba(245,200,66,0.3); flex-shrink: 0;}
+.logo-text { display: flex; flex-direction: column; }
+.logo-name { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; color: #fff; line-height: 1; }
+.logo-name em { color: var(--gold); font-style: normal; }
+.logo-sub { font-size: 9px; font-family: 'Space Mono'; color: var(--muted); letter-spacing: 1.5px; text-transform: uppercase; margin-top: 3px; }
+
+.nav-item { display: flex; align-items: center; gap: 12px; padding: 13px 16px; border-radius: var(--r-md); cursor: pointer; transition: all 0.25s var(--ease); color: var(--muted); font-weight: 500; font-size: 14px; margin-bottom: 5px; }
+.nav-item:hover { background: rgba(255,255,255,0.04); color: var(--text); transform: translateX(-3px); }
+.nav-item.active { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #000; font-weight: 800; box-shadow: 0 4px 20px rgba(245,200,66,0.25); }
+
+/* ════════ الصفحات والتوسيط ════════ */
+.page-section { display: none; animation: fadeUp 0.5s var(--ease) both; }
+.page-section.active-page { display: block; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+.hero { max-width: 820px; margin: 0 auto 50px; text-align: center; }
+.hero-title { font-size: clamp(32px, 4vw, 52px); font-weight: 900; line-height: 1.15; margin-bottom: 16px; }
+.hero-title .accent { color: transparent; background: linear-gradient(135deg, var(--gold) 0%, #ffdd55 50%, var(--gold2) 100%); -webkit-background-clip: text; }
+
+.search-box { display: flex; align-items: center; background: rgba(14,14,26,0.9); border: 1px solid rgba(245,200,66,0.18); border-radius: 26px; padding: 8px 8px 8px 24px; gap: 12px; margin-top: 30px; box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+.search-input { flex: 1; background: transparent; border: none; color: #fff; font-size: 16px; outline: none; text-align: right; }
+.search-btn { background: linear-gradient(135deg, var(--gold), var(--gold2)); border: none; padding: 16px 32px; border-radius: 20px; color: #0a0800; font-weight: 900; font-size: 15px; cursor: pointer; }
+
+.filters-row { display: flex; justify-content: center; gap: 12px; margin-top: 20px; }
+.filter-select { background: rgba(14,14,26,0.8); color: #fff; border: 1px solid var(--border); padding: 10px 18px; border-radius: 12px; outline: none; }
+.chips-row { display: flex; justify-content: center; flex-wrap: wrap; gap: 12px; margin-top: 30px; }
+.topic-chip { padding: 9px 20px; border-radius: 30px; border: 1px solid var(--border); background: rgba(14,14,26,0.6); cursor: pointer; font-size:13px; color: var(--muted); transition: 0.3s;}
+.topic-chip:hover { border-color: var(--gold); color: var(--gold); }
+
+/* ════════ البطاقات (توسيط وتنسيق أنيق) ════════ */
+.result-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 32px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+.result-title { font-size: 28px; font-weight: 900; color: #fff; }
+
+.levels-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+.level-card { background: rgba(12, 12, 22, 0.85); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 24px; transition: all 0.35s; position:relative; overflow:hidden; text-align: center; backdrop-filter: blur(12px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+.level-card:hover { border-color: rgba(245,200,66,0.3); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+
+.card-module { font-family: 'Space Mono'; color: var(--gold); font-size: 11px; margin-bottom: 12px; font-weight: 700; letter-spacing: 1px;}
+.lv-title { font-size: 18px; font-weight: 800; margin-bottom: 12px; color: #fff; }
+.lv-summary { font-size: 13px; color: var(--muted); line-height: 1.6; margin-bottom: 20px; }
+
+.hbtn-gold { background: linear-gradient(135deg, var(--gold), var(--gold2)); color: #0a0800; font-weight: 800; padding: 12px 24px; border-radius: 12px; border: none; cursor: pointer; font-family: 'Tajawal'; font-size: 14px; transition: 0.3s; }
+.hbtn-gold:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(245,200,66,0.4); }
+
+.card-btn { padding: 10px 14px; border-radius: 10px; border: 1px solid var(--border); background: rgba(255,255,255,0.03); color: var(--text); cursor: pointer; font-weight: 600; width:100%; margin-top:8px; transition: 0.3s;}
+.card-btn.primary { background: rgba(245,200,66,0.1); border-color: rgba(245,200,66,0.25); color: var(--gold); }
+.card-btn:hover { background: rgba(255,255,255,0.08); }
+
+/* ════════ أزرار اليوتيوب والتحميل (تم استعادتها) ════════ */
+.yt-choice { background: rgba(0,0,0,0.3); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 15px; }
+.yt-badge { font-size: 9px; font-family: 'Space Mono'; font-weight: 700; color: var(--gold); letter-spacing: 1px; margin-bottom: 8px;}
+.yt-vidtitle { font-size: 13px; font-weight: 700; color: #fff; margin-bottom: 12px; }
+.yt-btns { display: flex; gap: 8px; justify-content: center;}
+.yt-play-btn, .yt-dl-btn { flex: 1; padding: 8px 10px; border-radius: 8px; cursor: pointer; font-family: 'Tajawal', sans-serif; font-size: 12px; font-weight: bold; transition: 0.2s; border: 1px solid var(--border); }
+.yt-play-btn { background: rgba(79,209,255,0.1); color: var(--blue); border-color: rgba(79,209,255,0.25); }
+.yt-dl-btn { background: rgba(255,255,255,0.05); color: var(--text); }
+.yt-play-btn:hover { background: rgba(79,209,255,0.2); }
+.yt-dl-btn:hover { background: rgba(255,255,255,0.1); }
+
+/* ════════ المودال و StudyView ════════ */
+#loadBox { display: none; text-align: center; padding-top: 80px; }
+.loader-text { font-size: 18px; color: var(--gold); font-weight: 700; }
+.toast { position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%); background: rgba(14,14,26,0.95); border: 1px solid var(--gold); color: #fff; padding: 13px 24px; border-radius: 30px; font-size: 13px; z-index: 9999; }
+#studyView { display: none; position: fixed; inset: 0; background: #020204; z-index: 5000; grid-template-columns: 1fr 360px; }
+.video-container { position: relative; padding-bottom: 56.25%; height: 0; background: #000; border-radius: 18px; overflow: hidden; margin:20px; }
+.video-container iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; }
+.playlist-sidebar { background: var(--surface); padding: 24px 18px; overflow-y: auto; }
+.playlist-item { display: flex; gap: 12px; padding: 12px; border-radius: 12px; cursor: pointer; align-items: center; color:var(--muted); }
+.playlist-item.active { background: rgba(245,200,66,0.1); color: var(--gold); font-weight:bold; border: 1px solid rgba(245,200,66,0.3);}
+.playlist-item img { width: 80px; border-radius: 8px; }
+
+.modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 6000; align-items: center; justify-content: center; backdrop-filter: blur(8px);}
+.modal-overlay.show { display: flex; }
+.modal { background: var(--surface2); border: 1px solid rgba(245,200,66,0.3); border-radius: var(--r-lg); width: 600px; max-height: 80vh; overflow-y:auto; padding:25px; box-shadow: 0 20px 60px rgba(0,0,0,0.8); }
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-inner">
+        <div class="logo-icon">⚡</div>
+        <div class="logo-text">
+          <div class="logo-name">El<em>Ggo</em>learn</div>
+          <div class="logo-sub">Academic AI Pro</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nav-item active" onclick="switchTab(this, 'homePage')">🏠 الرئيسية (Home)</div>
+    <div class="nav-item" onclick="switchTab(this, 'roadmapPage'); checkRoadmap()">🗺️ مسار التعلم (Roadmap)</div>
+    <div class="nav-item" onclick="switchTab(this, 'videosPage'); loadVideos()">🎬 الفيديوهات (Videos)</div>
+    <div class="nav-item" onclick="switchTab(this, 'booksPage'); loadBooks()">📚 الكتب والمراجع (Books)</div>
+    <div class="nav-item" onclick="switchTab(this, 'historyPage'); loadHistory()">⏱️ سجل المسارات (History)</div>
+
+    <div style="margin-top:auto; text-align:center;">
+      <button class="card-btn" style="color:var(--red); border-color:rgba(255,95,109,0.3);" onclick="py('clear_cache'); showToast('تم مسح الذاكرة بنجاح')">مسح الذاكرة المؤقتة 🗑️</button>
+    </div>
+  </aside>
+
+  <main class="main">
+    
+    <div id="homePage" class="page-section active-page">
+      <div class="hero">
+        <h1 class="hero-title">ماذا تريد أن <span class="accent">تتعلم</span> اليوم؟</h1>
+        <div style="color:var(--muted); font-size:15px; margin-bottom: 20px;">أدخل المجال وسنقوم بتوليد خارطة طريق أكاديمية ذكية لك</div>
+        
+        <div class="search-box">
+          <input class="search-input" id="topicInput" placeholder="مثال: تحليل البيانات، الذكاء الاصطناعي، الأمن السيبراني..." onkeydown="if(event.key==='Enter') generate()">
+          <button class="search-btn" onclick="generate()">توليد المسار ✦</button>
+        </div>
+        
+        <div class="filters-row">
+          <select class="filter-select" id="levelSelect">
+            <option value="beginner">المستوى: مبتدئ</option>
+            <option value="intermediate">المستوى: متوسط</option>
+            <option value="advanced">المستوى: متقدم</option>
+          </select>
+          <select class="filter-select" id="langSelect">
+            <option value="ar">اللغة: العربية</option>
+            <option value="en">اللغة: الإنجليزية</option>
+          </select>
+        </div>
+        
+        <div class="chips-row">
+          <div class="topic-chip" onclick="$('topicInput').value='Python'">🐍 Python</div>
+          <div class="topic-chip" onclick="$('topicInput').value='تطوير الويب'">🌐 تطوير الويب</div>
+          <div class="topic-chip" onclick="$('topicInput').value='أمن المعلومات'">🔐 أمن المعلومات</div>
+          <div class="topic-chip" onclick="$('topicInput').value='DevOps'">☁️ DevOps</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="roadmapPage" class="page-section">
+      <div class="result-header">
+        <h2 class="result-title" id="rmTopic">مسار التعلم</h2>
+        <button class="hbtn-gold" onclick="py('export_pdf', _currentRoadmap)">📄 تصدير PDF</button>
+      </div>
+      <div class="levels-grid" id="rmGrid">
+        <div style="color:var(--muted); text-align:center; padding:40px;">يرجى توليد مسار جديد من الصفحة الرئيسية للبدء.</div>
+      </div>
+    </div>
+
+    <div id="videosPage" class="page-section">
+      <div class="result-header"><h2 class="result-title">الفيديوهات والكورسات المحفوظة</h2></div>
+      <div class="levels-grid" id="vidGrid"></div>
+    </div>
+
+    <div id="booksPage" class="page-section">
+      <div class="result-header"><h2 class="result-title">المكتبة الأكاديمية (PDFs)</h2></div>
+      <div class="levels-grid" id="bookGrid"></div>
+    </div>
+
+    <div id="historyPage" class="page-section">
+      <div class="result-header"><h2 class="result-title">المسارات السابقة المحفوظة</h2></div>
+      <div class="levels-grid" id="histGrid"></div>
+    </div>
+
+    <div id="loadBox">
+      <div class="loader-text" id="loadLabel">جاري التفكير وبناء مستقبلك...</div>
+      <div style="color:var(--muted); font-size:13px; margin-top:10px;">هذا قد يستغرق بضع ثوانٍ</div>
+    </div>
+
+  </main>
+</div>
+
+<div id="studyView">
+  <div style="padding:20px; display:flex; flex-direction:column;">
+    <button class="card-btn" style="width:fit-content; border-color:rgba(255,255,255,0.2)" onclick="$('studyView').style.display='none'; $('mainPlayer').innerHTML=''">← إغلاق الكورس</button>
+    <div class="video-container" id="mainPlayer"></div>
+  </div>
+  <div class="playlist-sidebar" id="playlistItems"></div>
+</div>
+
+<div class="modal-overlay" id="pdfModal">
+  <div class="modal">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid var(--border); padding-bottom:15px;">
+      <h3 style="color:var(--gold); font-size:18px;">📚 المراجع والكتب المتاحة</h3>
+      <button class="card-btn" style="width:auto; padding:5px 12px; margin:0;" onclick="$('pdfModal').classList.remove('show')">✕</button>
+    </div>
+    <div id="pdfModalBody"></div>
+  </div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+let _currentRoadmap = null;
+
+async function py(fn, ...args) {
+  if (window.pywebview && window.pywebview.api) return await window.pywebview.api[fn](...args);
+  return null;
+}
+
+function showToast(msg) {
+  const existing = document.querySelectorAll('.toast');
+  existing.forEach(t => t.remove());
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ── التبديل بين الصفحات ──
+function switchTab(el, pageId) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active-page'));
+  $('loadBox').style.display = 'none';
+  $(pageId).classList.add('active-page');
+}
+
+// ── توليد مسار جديد ──
+async function generate() {
+  const topic = $('topicInput').value.trim();
+  if (!topic) return showToast('⚠️ يرجى كتابة المجال أولاً في شريط البحث');
+
+  document.querySelectorAll('.page-section').forEach(p => p.classList.remove('active-page'));
+  $('loadBox').style.display = 'block';
+
+  const res = await py('generate_roadmap', topic, $('levelSelect').value, $('langSelect').value);
+  if (res && res.ok) {
+    _currentRoadmap = res.data;
+    switchTab(document.querySelectorAll('.nav-item')[1], 'roadmapPage'); 
+    renderRoadmap();
+  } else {
+    showToast('❌ حدث خطأ، تأكد من الاتصال بالإنترنت');
+    switchTab(document.querySelectorAll('.nav-item')[0], 'homePage');
+  }
+}
+
+// ── رسم المسار (Roadmap) وتوسيطه ──
+function checkRoadmap() { if(_currentRoadmap) renderRoadmap(); }
+
+function renderRoadmap() {
+  if(!_currentRoadmap) return;
+  $('rmTopic').innerHTML = "مسار: <span style='color:var(--gold)'>" + _currentRoadmap.topic + "</span>";
+  $('rmGrid').innerHTML = '';
+  _currentRoadmap.levels.forEach(lv => {
+    const card = document.createElement('div');
+    card.className = `level-card`;
+    card.innerHTML = `
+      <div class="card-module">المستوى ${lv.id}</div>
+      <div class="lv-title">${lv.title}</div>
+      <div class="lv-summary">${lv.summary}</div>
+      
+      <div id="ytLinks${lv.id}">
+         <span style="color:var(--muted); font-size:12px;">جاري البحث عن أفضل الكورسات...</span>
+      </div>
+      
+      <div style="margin-top:15px; border-top:1px solid var(--border); padding-top:15px;">
+        <button class="card-btn primary" onclick="openPdfSearch('${lv.eng_query}', '${lv.title}')">📚 البحث عن مراجع PDF</button>
+      </div>
+    `;
+    $('rmGrid').appendChild(card);
+  });
+}
+
+// ── تحميل بيانات الصفحات الأخرى ──
+async function loadVideos() {
+  $('vidGrid').innerHTML = '<div style="color:var(--muted)">جاري التحميل...</div>';
+  const res = await py('get_saved_videos');
+  if(res && res.ok) {
+    $('vidGrid').innerHTML = res.data.length ? res.data.map(item => `
+      <div class="level-card">
+        <div class="card-module">🎬 مسار فيديو</div>
+        <div class="lv-title">${item.title}</div>
+        <button class="hbtn-gold" style="width:100%; margin-top:15px;" onclick="startStudy('${item.link}', '${item.title.replace(/'/g, "\\'")}')">مواصلة المشاهدة</button>
+      </div>
+    `).join('') : '<div style="color:var(--muted)">لا توجد فيديوهات محفوظة.</div>';
+  }
+}
+
+async function loadBooks() {
+  $('bookGrid').innerHTML = '<div style="color:var(--muted)">جاري التحميل...</div>';
+  const res = await py('get_saved_books');
+  if(res && res.ok) {
+    $('bookGrid').innerHTML = res.data.length ? res.data.map(item => `
+      <div class="level-card">
+        <div class="card-module">📚 مرجع PDF</div>
+        <div class="lv-title">${item.title}</div>
+        <button class="card-btn primary" onclick="py('open_url', '${item.link}')">فتح الكتاب</button>
+      </div>
+    `).join('') : '<div style="color:var(--muted)">لا توجد كتب محفوظة.</div>';
+  }
+}
+
+async function loadHistory() {
+  $('histGrid').innerHTML = '<div style="color:var(--muted)">جاري التحميل...</div>';
+  const res = await py('get_history');
+  if(res && res.ok) {
+    $('histGrid').innerHTML = res.data.length ? res.data.map(item => `
+      <div class="level-card">
+        <div class="card-module">⏱️ مسار سابق</div>
+        <div class="lv-title">${item.topic}</div>
+        <div style="color:var(--muted); font-size:12px; margin-bottom:15px">${item.level}</div>
+        <button class="card-btn" style="border-color:var(--gold); color:var(--gold)" onclick="resumeRoadmap(${item.id})">استرجاع المسار</button>
+      </div>
+    `).join('') : '<div style="color:var(--muted)">لا توجد مسارات سابقة.</div>';
+  }
+}
+
+async function resumeRoadmap(id) {
+  const res = await py('load_saved_roadmap', id);
+  if(res && res.ok) { 
+    _currentRoadmap = res.data; 
+    switchTab(document.querySelectorAll('.nav-item')[1], 'roadmapPage'); 
+    renderRoadmap(); 
+  }
+}
+
+// ── مشغل الفيديوهات ──
+async function startStudy(playlistUrl, playlistTitle = "Course") {
+  showToast('⏳ جاري تجهيز بيئة المشاهدة...');
+  const res = await py('get_course_content', playlistUrl, playlistTitle);
+  if (res && res.ok && res.videos.length > 0) {
+    const sidebar = $('playlistItems');
+    sidebar.innerHTML = '';
+    res.videos.forEach((vid, i) => {
+      const item = document.createElement('div');
+      item.className = 'playlist-item' + (i === 0 ? ' active' : '');
+      item.onclick = () => {
+        $('mainPlayer').innerHTML = `<iframe src="https://www.youtube.com/embed/${vid.videoId}?autoplay=1" allowfullscreen></iframe>`;
+        document.querySelectorAll('.playlist-item').forEach(el => el.classList.remove('active'));
+        item.classList.add('active');
+      };
+      item.innerHTML = `<img src="${vid.thumb}" alt=""> <span style="font-size:13px; line-height:1.4;">${vid.title}</span>`;
+      sidebar.appendChild(item);
+    });
+    $('mainPlayer').innerHTML = `<iframe src="https://www.youtube.com/embed/${res.videos[0].videoId}?autoplay=1" allowfullscreen></iframe>`;
+    $('studyView').style.display = 'grid';
+  } else { showToast('❌ تعذر جلب الفيديوهات.'); }
+}
+
+// ── تحميل المراجع (مع حل مشكلة التجميد) ──
+async function openPdfSearch(query, title) {
+  $('pdfModal').classList.add('show');
+  $('pdfModalBody').innerHTML = `<div style="text-align:center; color:var(--gold); padding:30px;">جاري البحث عن المصادر الأكاديمية...</div>`;
+  
+  const res = await py('get_pdf_suggestions', query);
+  if (res && res.ok) {
+    $('pdfModalBody').innerHTML = res.data.map(pdf => `
+      <div style="background:rgba(255,255,255,0.05); padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:13px; color:#fff; width:70%; text-align:right;">${pdf.title}</span>
+        <button class="hbtn-gold" style="width:auto; padding:8px 15px; font-size:12px; margin:0;" 
+                onclick="downloadPdfAction(this, '${pdf.url}','${title.replace(/'/g,"\\'")}','${pdf.title.replace(/'/g,"\\'")}')">
+           تحميل
+        </button>
+      </div>
+    `).join('');
+  } else { 
+    $('pdfModalBody').innerHTML = '<div style="color:var(--red); text-align:center; padding:20px;">عذراً، لم نتمكن من إيجاد مراجع لهذا الموضوع.</div>'; 
+  }
+}
+
+// دالة جديدة لمعالجة حالة زر تحميل الـ PDF بصرياً
+async function downloadPdfAction(btnElement, url, levelTitle, pdfTitle) {
+    btnElement.textContent = "⏳ جاري التحميل...";
+    btnElement.style.opacity = "0.7";
+    btnElement.disabled = true; // منع الضغط المزدوج
+    
+    const res = await py('download_single_pdf', url, levelTitle, pdfTitle);
+    
+    if(res && res.ok) {
+        btnElement.textContent = "✅ تم التحميل";
+        btnElement.style.background = "var(--green)";
+        btnElement.style.color = "#000";
+        showToast('تم تحميل الكتاب وإضافته لمكتبتك!');
+    } else {
+        btnElement.textContent = "❌ فشل";
+        btnElement.style.background = "var(--red)";
+        btnElement.disabled = false;
+        showToast('فشل التحميل، قد يكون الرابط تالفاً أو محمياً.');
+    }
+}
+
+// ── استقبال رسائل الباك-إند (اليوتيوب) ──
+window.ElGgoAPI = {
+  onStatusUpdate(txt) { if ($('loadLabel')) $('loadLabel').textContent = txt; },
+  onYTLinks(lvId, dataStr) {
+    const data = JSON.parse(dataStr);
+    const container = $(`ytLinks${lvId}`);
+    if (!container || !data.all_time) return;
+    
+    const safeTitle = data.all_time.title.replace(/'/g, "\\'");
+    // استعادة زر التحميل الخاص بالفيديو وتوسيط البطاقة
+    container.innerHTML = `
+      <div class="yt-choice">
+        <div class="yt-badge">✦ BEST RECOMMENDATION</div>
+        <div class="yt-vidtitle">${data.all_time.title}</div>
+        <div class="yt-btns">
+          <button class="yt-play-btn" onclick="startStudy('${data.all_time.url}', '${safeTitle}')">▶ دراسة الكورس</button>
+          <button class="yt-dl-btn" onclick="py('download_playlist','${data.all_time.url}','Level_${lvId}')">⬇ تحميل للفولدر</button>
+        </div>
+      </div>`;
+  }
+};
+</script>
+</body>
+</html>
